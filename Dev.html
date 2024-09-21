@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaderboard UI</title>
+    <!-- React and Babel CDN -->
+    <script src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    <!-- Fonts and Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Heroicons CDN for icons -->
+    <script src="https://unpkg.com/heroicons@1.0.0/outline/heroicons-outline.js"></script>
+</head>
+<body class="bg-gray-50">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const initialLeaderboardData = [
+            { id: 1, name: "Mahek", score: 230, image: "https://source.unsplash.com/100x100/?person", rank: 1 },
+            { id: 2, name: "Ashish", score: 198, image: "https://source.unsplash.com/100x100/?portrait", rank: 2 },
+            { id: 3, name: "Tejas", score: 82, image: "https://source.unsplash.com/100x100/?avatar", rank: 3 },
+            { id: 4, name: "Manoj", score: 81, image: "https://source.unsplash.com/100x100/?man", rank: 4 },
+            { id: 5, name: "AMIT", score: 77, image: "https://source.unsplash.com/100x100/?male", rank: 5 },
+            { id: 6, name: "Karan", score: 75, image: "https://source.unsplash.com/100x100/?guy", rank: 6 },
+            { id: 7, name: "JAGA", score: 45, image: "https://source.unsplash.com/100x100/?profile", rank: 7 },
+            { id: 8, name: "TaskPlanet", score: 78, image: "https://source.unsplash.com/100x100/?team", rank: 8 },
+            { id: 9, name: "Neha", score: 55, image: "https://source.unsplash.com/100x100/?woman", rank: 9 },
+            { id: 10, name: "Rohan", score: 60, image: "https://source.unsplash.com/100x100/?boy", rank: 10 }
+        ];
+
+        function Leaderboard() {
+            const [leaderboardData, setLeaderboardData] = React.useState(initialLeaderboardData);
+            const [selectedUserId, setSelectedUserId] = React.useState(null);
+
+            const handleClaimPoints = () => {
+                if (!selectedUserId) return;
+
+                const randomPoints = Math.floor(Math.random() * 10) + 1;
+
+                // Update the score for the selected user
+                const updatedData = leaderboardData.map(user => {
+                    if (user.id === selectedUserId) {
+                        return { ...user, score: user.score + randomPoints };
+                    }
+                    return user;
+                });
+
+                // Sort the leaderboard based on the updated scores
+                const sortedData = updatedData.sort((a, b) => b.score - a.score);
+
+                // Update rank based on the new sorted data
+                const rankedData = sortedData.map((user, index) => ({
+                    ...user,
+                    rank: index + 1
+                }));
+
+                setLeaderboardData(rankedData);
+            };
+
+            return (
+                <div className="font-roboto max-w-sm mx-auto bg-white shadow-lg rounded-lg overflow-hidden mt-10">
+                    {/* Header */}
+                    <div className="bg-blue-600 text-white p-3 flex justify-between items-center">
+                        <div className="text-lg font-semibold flex items-center">
+                            <svg className="h-6 w-6 text-white mr-2">
+                                <use href="#trophy"></use>
+                            </svg>
+                            Leaderboard
+                        </div>
+                    </div>
+
+                    {/* User Selection */}
+                    <div className="p-3">
+                        <h2 className="text-lg font-semibold">Select a User</h2>
+                        <div className="flex flex-wrap">
+                            {leaderboardData.map(user => (
+                                <button
+                                    key={user.id}
+                                    onClick={() => setSelectedUserId(user.id)}
+                                    className={`p-2 m-1 rounded ${selectedUserId === user.id ? 'bg-blue-500 text-white' : 'bg-gray-200'} flex items-center`}
+                                >
+                                    <img
+                                        src={user.image}
+                                        alt={user.name}
+                                        className="w-6 h-6 rounded-full mr-2"
+                                    />
+                                    {user.name}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Claim Points Button */}
+                    <div className="p-3 text-center">
+                        <button
+                            onClick={handleClaimPoints}
+                            className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded transition duration-300"
+                        >
+                            Claim Random Points
+                        </button>
+                    </div>
+
+                    {/* Leaderboard Display */}
+                    <div className="p-3">
+                        <h2 className="text-lg font-semibold">Leaderboard</h2>
+                        {leaderboardData.map(user => (
+                            <div key={user.id} className={`flex justify-between items-center p-2 mt-2 rounded ${user.rank <= 3 ? 'bg-yellow-100' : 'bg-gray-100'}`}>
+                                <div className="flex items-center">
+                                    <div className="text-sm font-medium mr-2">{user.rank}.</div>
+                                    <img
+                                        src={user.image}
+                                        alt={user.name}
+                                        className="w-8 h-8 rounded-full mr-2"
+                                    />
+                                    <div className="text-sm font-medium">{user.name}</div>
+                                </div>
+                                <div className="text-green-500 font-semibold">{user.score} points</div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        }
+
+        ReactDOM.render(<Leaderboard />, document.getElementById('root'));
+    </script>
+
+    <!-- Heroicons Trophy Icon -->
+    <svg style="display: none;">
+        <symbol id="trophy" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M7 21V19H17V21C17 21.55 16.55 22 16 22H8C7.45 22 7 21.55 7 21ZM20 3H17V2C17 1.45 16.55 1 16 1H8C7.45 1 7 1.45 7 2V3H4C3.45 3 3 3.45 3 4V7C3 9.21 4.79 11 7 11C7.89 11 8.71 10.74 9.41 10.31C9.76 10.53 10.16 10.69 10.6 10.79C10.17 12.24 9.35 14.33 7.83 15.69C7.52 15.99 7.22 16.29 7 16.61V18H17V16.61C16.78 16.29 16.48 15.99 16.17 15.69C14.65 14.33 13.83 12.24 13.4 10.79C13.84 10.69 14.24 10.53 14.59 10.31C15.29 10.74 16.11 11 17 11C19.21 11 21 9.21 21 7V4C21 3.45 20.55 3 20 3ZM19 7C19 8.1 18.1 9 17 9C15.9 9 15 8.1 15 7V5H19V7ZM9 5V7C9 8.1 8.1 9 7 9C5.9 9 5 8.1 5 7V5H9Z" fill="currentColor"/>
+        </symbol>
+    </svg>
+</body>
+</html>
